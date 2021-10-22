@@ -74,23 +74,6 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
-    print("----------------SATRT_TESTttt-----")
-    print()
-    # print(problem.__dict__)
-
-    print(problem.walls)
-    ws = problem.walls
-    print('-------')
-    print('start ',problem.startState)
-    print('goal ',problem.goal)
-    print(problem.visualize)
-    print(problem._visited)
-    print(problem._visitedlist)
-    print(problem._expanded)
-    print()
-    print()
-    print()
-    print("---------TEST------------------")
 
     walls = problem.walls
 
@@ -137,7 +120,7 @@ def depthFirstSearch(problem):
 
     goal_path =[]
     curr_node = problem.goal
-    goal_path.append(curr_node)
+    # goal_path.append(curr_node)
     while True:
         #node that we use to come to the curr_node,
         node = storage[curr_node]
@@ -163,8 +146,7 @@ def depthFirstSearch(problem):
         #reach the start state
         if(node == start):
             break
-    print('-------------')
-    print(len(goal_path))
+    print('steps length: ',len(goal_path))
    
 
     # import time
