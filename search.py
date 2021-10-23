@@ -97,7 +97,6 @@ def depthFirstSearch(problem):
             goal_state = element
             print('goal found')
             break
-        # col, row = element
 
         successors = problem.getSuccessors(element)
         for successor in successors:
@@ -107,15 +106,13 @@ def depthFirstSearch(problem):
                 fringe.push(node)
                 storage[node] = [element, direction]
 
-    from game import Directions
-
     goal_path = []
     curr_node = goal_state
     while True:
         # node that we use to go to the curr_node,
         # means: node----->curr_node
         node = storage[curr_node]
-        
+
         # 1th element contains the direction
         goal_path.append(node[1])
 
@@ -153,8 +150,58 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    start_state = problem.getStartState()
+    goal_state = None
+    visited = set()  # explored nodes
+    visited.add(start_state)
+    from util import Queue
+    fringe = Queue()  # Queue
+    fringe.push(start_state)
+
+    storage = dict()
+
+    while not fringe.isEmpty():
+        element = fringe.pop()
+
+        if problem.isGoalState(element):
+            goal_state = element
+            print('goal found')
+            break
+        successors = problem.getSuccessors(element)
+        for successor in successors:
+            node = successor[0]
+            direction = successor[1]
+            if(node not in visited):
+                fringe.push(node)
+                storage[node] = [element, direction]
+
+                visited.add(node)
+
+    goal_path = []
+    curr_node = goal_state
+    while True:
+        # node that we use to go to the curr_node,
+        # means: node----->curr_node
+        node = storage[curr_node]
+
+        # 1th element contains the direction
+        goal_path.append(node[1])
+
+        # update current node
+        curr_node = node[0]
+
+        # reach the start state
+        if(node[0] == start_state):
+            break
+
+    print('steps length: ', len(goal_path))
+
+    # import time
+    # time.sleep(100)
+
+    # reverse the path by slicing
+    return goal_path[::-1]
 
 
 def uniformCostSearch(problem):
