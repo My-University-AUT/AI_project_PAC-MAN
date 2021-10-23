@@ -71,88 +71,67 @@ def tinyMazeSearch(problem):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return  [s, s, w, s, w, w, s, w]
+    return [s, s, w, s, w, w, s, w]
+
 
 def depthFirstSearch(problem):
 
-    walls = problem.walls
-
-    visited = set()
-    start = problem.startState
-
+    # walls = problem.walls
+    start_state = problem.getStartState()
+    goal_state = None
+    visited = set()  # explored nodes
     from util import Stack
-    stack = Stack()
-
-    stack.push(start)
+    fringe = Stack()  # stack
+    fringe.push(start_state)
 
     storage = dict()
 
-    while not stack.isEmpty():
-        element = stack.pop()
+    while not fringe.isEmpty():
+        element = fringe.pop()
 
         if element in visited:
             continue
         visited.add(element)
-        # print(f'--->{element}')
-        if(element == problem.goal):
+
+        if problem.isGoalState(element):
+            goal_state = element
             print('goal found')
             break
-        col, row = element
-        if walls[col+1][row] == False and ((col+1, row) not in visited):
-            stack.push(((col+1, row)))
-            storage[(col+1, row)] = (col, row)
-        if walls[col-1][row] == False and ((col-1, row) not in visited):
-            stack.push(((col-1, row)))
-            storage[(col-1, row)] = (col, row)
-        if walls[col][row+1] == False and ((col, row+1) not in visited):
-            stack.push(((col, row+1)))
-            storage[(col, row+1)] = (col, row)
-        if walls[col][row-1] == False and ((col, row-1) not in visited):
-            stack.push(((col, row-1)))
-            storage[(col, row-1)] = (col, row)
+        # col, row = element
+
+        successors = problem.getSuccessors(element)
+        for successor in successors:
+            node = successor[0]
+            direction = successor[1]
+            if(node not in visited):
+                fringe.push(node)
+                storage[node] = [element, direction]
 
     from game import Directions
 
-    s = Directions.SOUTH
-    w = Directions.WEST
-    e = Directions.EAST
-    n = Directions.NORTH
-
-    goal_path =[]
-    curr_node = problem.goal
-    # goal_path.append(curr_node)
+    goal_path = []
+    curr_node = goal_state
     while True:
-        #node that we use to come to the curr_node,
+        # node that we use to go to the curr_node,
+        # means: node----->curr_node
         node = storage[curr_node]
-
-        col,row = node
-        #means column of node is greater than column of current node(curr_node), the agent should go to the west
-        if  (col-1,row) == curr_node:
-            goal_path.append(w)
-        # if column of node is less than curr_node
-        elif (col+1,row) == curr_node:
-            goal_path.append(e)
-        #means row of node is greater than column of current node(curr_node), the agent should go to the south
-        elif (col,row-1) == curr_node:
-            goal_path.append(s)
-        # if row of node is less than curr_node
-        elif (col,row+1) == curr_node:
-            goal_path.append(n)
         
-        curr_node = node
-        
-        # goal_path.append(node)
+        # 1th element contains the direction
+        goal_path.append(node[1])
 
-        #reach the start state
-        if(node == start):
+        # update current node
+        curr_node = node[0]
+
+        # reach the start state
+        if(node[0] == start_state):
             break
-    print('steps length: ',len(goal_path))
-   
+
+    print('steps length: ', len(goal_path))
 
     # import time
     # time.sleep(100)
 
-    #reverse the path by slicing
+    # reverse the path by slicing
     return goal_path[::-1]
 
     """
