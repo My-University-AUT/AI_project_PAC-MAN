@@ -175,7 +175,6 @@ def breadthFirstSearch(problem):
             if(node not in visited):
                 fringe.push(node)
                 storage[node] = [element, direction]
-
                 visited.add(node)
 
     goal_path = []
@@ -185,7 +184,7 @@ def breadthFirstSearch(problem):
         # means: node----->curr_node
         node = storage[curr_node]
 
-        # 1th element contains the direction
+        # 1th element contains the direction that we us to go to the current node
         goal_path.append(node[1])
 
         # update current node
@@ -197,6 +196,8 @@ def breadthFirstSearch(problem):
 
     print('steps length: ', len(goal_path))
 
+    print('cost of path: ', problem.getCostOfActions(goal_path[::-1]))
+
     # import time
     # time.sleep(100)
 
@@ -205,9 +206,78 @@ def breadthFirstSearch(problem):
 
 
 def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start_state = problem.getStartState()
+    goal_state = None
+
+    visited = set()  # explored nodes
+    # visited.add(start_state)
+
+    from util import PriorityQueue
+    fringe = PriorityQueue()  # Queue
+    # cost for starting node to reach to start is zero :))
+    fringe.push(start_state, 0)
+
+    storage = dict()
+    print('------------------start ucs----------------------')
+    while not fringe.isEmpty():
+        priority, element = fringe.pop()
+        print('poped element: ', element, priority)
+        if problem.isGoalState(element):
+            goal_state = element
+            print('goal found')
+            break
+
+        visited.add(element)
+
+        successors = problem.getSuccessors(element)
+        
+        for successor in successors:
+            node = successor[0]
+            direction = successor[1]
+
+            # we should add comulative costs as priority
+            # TODO: how sould i get comulative cost from starting node to this node(successor[0])
+            cost = successor[2]
+            # print(node, priority+cost)
+            if(node not in visited):
+                updated = fringe.update(node, priority+cost)
+
+                # در اینجا چک کنیم که اگر هزینه ی نودی که قرار است به تابع اپدیت داده شود بیشتر از هزینه ی قبلی بود، 
+                # آنگاه نود جدید را به استوریج اضافه نکنیم
+                if updated:
+                    storage[node] = [element, direction]
+                # visited.add(node)
+            # else:
+            #     fringe.update(node, priority+cost)
+
+
+
+    goal_path = []
+    curr_node = goal_state
+    while True:
+        # node that we use to go to the curr_node,
+        # means: node----->curr_node
+        node = storage[curr_node]
+
+        # 1th element contains the direction that we us to go to the current node
+        goal_path.append(node[1])
+
+        # update current node
+        curr_node = node[0]
+
+        # reach the start state
+        if(node[0] == start_state):
+            break
+    print('=======================end testing----------------------------')
+    print('steps length: ', len(goal_path))
+
+    print('cost of path: ', problem.getCostOfActions(goal_path[::-1]))
+
+    # import time
+    # time.sleep(100)
+
+    # reverse the path by slicing
+    return goal_path[::-1]
 
 
 def nullHeuristic(state, problem=None):
