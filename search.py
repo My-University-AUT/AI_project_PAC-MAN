@@ -210,7 +210,6 @@ def uniformCostSearch(problem):
     goal_state = None
 
     visited = set()  # explored nodes
-    # visited.add(start_state)
 
     from util import PriorityQueue
     fringe = PriorityQueue()  # Queue
@@ -222,39 +221,35 @@ def uniformCostSearch(problem):
 
     storage = dict()
     while not fringe.isEmpty():
-        element = fringe.pop()
-        if problem.isGoalState(element):
-            goal_state = element
+        curr_node = fringe.pop()
+        if problem.isGoalState(curr_node):
+            goal_state = curr_node
             print('goal found')
             break
 
-        visited.add(element)
+        visited.add(curr_node)
 
-        current_g_value = g_vals[element]
+        current_g_value = g_vals[curr_node]
 
-        successors = problem.getSuccessors(element)
+        successors = problem.getSuccessors(curr_node)
 
         for successor in successors:
             node = successor[0]
             direction = successor[1]
 
-            # we should add comulative costs as priority
-            # TODO: how sould i get comulative cost from starting node to this node(successor[0])
-            cost = successor[2]
+            cost_from_curr_node_to_node = successor[2]
             # print(node, priority+cost)
             if(node not in visited):
-                node_g_value = current_g_value + cost
+                node_g_value = current_g_value + cost_from_curr_node_to_node
                 updated = fringe.update(node, node_g_value)
 
                 # در اینجا چک کنیم که اگر هزینه ی نودی که قرار است به تابع اپدیت داده شود بیشتر از هزینه ی قبلی بود،
                 # آنگاه نود جدید را به استوریج اضافه نکنیم
                 if updated:
-                    storage[node] = [element, direction]
+                    storage[node] = [curr_node, direction]
                     g_vals[node] = node_g_value
-                # visited.add(node)
-            # else:
-            #     fringe.update(node, priority+cost)
-
+            
+            
     goal_path = []
     curr_node = goal_state
     while True:
