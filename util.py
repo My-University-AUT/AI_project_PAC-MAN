@@ -196,8 +196,8 @@ class PriorityQueue:
     def pop(self):
         # (_, _, item) = heapq.heappop(self.heap)
         # return item
-        (priority, _, item) = heapq.heappop(self.heap)
-        return (priority, item)
+        ( _, _, item) = heapq.heappop(self.heap)
+        return item
 
     def isEmpty(self):
         return len(self.heap) == 0
@@ -218,7 +218,7 @@ class PriorityQueue:
         else:
             self.push(item, priority)
             return True
-        #  means it doesn't do anything 
+        #  means it doesn't do anything
         return False
 
 
