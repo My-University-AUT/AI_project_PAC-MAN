@@ -217,11 +217,12 @@ def uniformCostSearch(problem):
     # cost for starting node to reach to start is zero :))
     fringe.push(start_state, 0)
 
+    g_vals = dict()  # stores all g_value of nodes
+    g_vals[start_state] = 0
+
     storage = dict()
-    print('------------------start ucs----------------------')
     while not fringe.isEmpty():
-        priority, element = fringe.pop()
-        print('poped element: ', element, priority)
+        element = fringe.pop()
         if problem.isGoalState(element):
             goal_state = element
             print('goal found')
@@ -229,8 +230,10 @@ def uniformCostSearch(problem):
 
         visited.add(element)
 
+        current_g_value = g_vals[element]
+
         successors = problem.getSuccessors(element)
-        
+
         for successor in successors:
             node = successor[0]
             direction = successor[1]
@@ -240,17 +243,17 @@ def uniformCostSearch(problem):
             cost = successor[2]
             # print(node, priority+cost)
             if(node not in visited):
-                updated = fringe.update(node, priority+cost)
+                node_g_value = current_g_value + cost
+                updated = fringe.update(node, node_g_value)
 
-                # در اینجا چک کنیم که اگر هزینه ی نودی که قرار است به تابع اپدیت داده شود بیشتر از هزینه ی قبلی بود، 
+                # در اینجا چک کنیم که اگر هزینه ی نودی که قرار است به تابع اپدیت داده شود بیشتر از هزینه ی قبلی بود،
                 # آنگاه نود جدید را به استوریج اضافه نکنیم
                 if updated:
                     storage[node] = [element, direction]
+                    g_vals[node] = node_g_value
                 # visited.add(node)
             # else:
             #     fringe.update(node, priority+cost)
-
-
 
     goal_path = []
     curr_node = goal_state
@@ -268,7 +271,6 @@ def uniformCostSearch(problem):
         # reach the start state
         if(node[0] == start_state):
             break
-    print('=======================end testing----------------------------')
     print('steps length: ', len(goal_path))
 
     print('cost of path: ', problem.getCostOfActions(goal_path[::-1]))
@@ -290,9 +292,86 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start_state = problem.getStartState()
+    goal_state = None
 
+    visited = set()  # explored nodes
+    # visited.add(start_state)
+
+    from util import PriorityQueue
+    fringe = PriorityQueue()  # Queue
+    # cost for starting node to reach to start is zero :))
+
+    F_value = heuristic(start_state, problem)  # at starting state: f(S) = h(S)
+    fringe.push(start_state, F_value)
+
+    g_vals = dict()  # stores all g_value of nodes
+    g_vals[start_state] = 0
+
+    storage = dict()
+
+    while not fringe.isEmpty():
+        curr_node = fringe.pop()
+        if problem.isGoalState(curr_node):
+            goal_state = curr_node
+            print('goal found')
+            break
+
+        visited.add(curr_node)
+
+        current_node_g_value = g_vals[curr_node]
+        
+        successors = problem.getSuccessors(curr_node)
+        for successor in successors:
+            node = successor[0]
+            direction = successor[1]
+
+            cost_from_curr_node_to_this_node = successor[2]
+            # print(node, priority+cost)
+            if(node not in visited):
+                h_value = heuristic(node, problem)
+
+                node_g_value = cost_from_curr_node_to_this_node + current_node_g_value
+
+                # node_g_value is the real backward cost
+                # h_value is the estimated forward cost
+                updated = fringe.update(node, node_g_value+h_value)
+
+                # در اینجا چک کنیم که اگر هزینه ی نودی که قرار است به تابع اپدیت داده شود بیشتر از هزینه ی قبلی بود،
+                # آنگاه نود جدید را به استوریج اضافه نکنیم
+                if updated:
+                    storage[node] = [curr_node, direction]
+                    g_vals[node] = node_g_value
+
+                # visited.add(node)
+            # else:
+            #     fringe.update(node, priority+cost)
+
+    goal_path = []
+    curr_node = goal_state
+    while True:
+        # node that we use to go to the curr_node,
+        # means: node----->curr_node
+        node = storage[curr_node]
+
+        # 1th element contains the direction that we us to go to the current node
+        goal_path.append(node[1])
+
+        # update current node
+        curr_node = node[0]
+
+        # reach the start state
+        if(node[0] == start_state):
+            break
+    print('steps length: ', len(goal_path))
+
+    print('cost of path: ', problem.getCostOfActions(goal_path[::-1]))
+
+    # import time
+    # time.sleep(100)
+
+    # reverse the path by slicing
+    return goal_path[::-1]
 
 # Abbreviations
 bfs = breadthFirstSearch
