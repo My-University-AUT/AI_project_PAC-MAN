@@ -75,85 +75,67 @@ def tinyMazeSearch(problem):
 
 
 def depthFirstSearch(problem):
+    return custom_search(problem, nullHeuristic, 'max')
 
-    # walls = problem.walls
-    start_state = problem.getStartState()
-    goal_state = None
-    visited = set()  # explored nodes
-    from util import Stack
-    fringe = Stack()  # stack
-    fringe.push(start_state)
+    # # walls = problem.walls
+    # start_state = problem.getStartState()
+    # goal_state = None
+    # visited = set()  # explored nodes
+    # from util import Stack
+    # fringe = Stack()  # stack
+    # fringe.push(start_state)
 
-    storage = dict()
+    # storage = dict()
 
-    while not fringe.isEmpty():
-        element = fringe.pop()
+    # while not fringe.isEmpty():
+    #     element = fringe.pop()
 
-        if element in visited:
-            continue
-        visited.add(element)
+    #     if element in visited:
+    #         continue
+    #     visited.add(element)
 
-        if problem.isGoalState(element):
-            goal_state = element
-            print('goal found')
-            break
+    #     if problem.isGoalState(element):
+    #         goal_state = element
+    #         print('goal found')
+    #         break
 
-        successors = problem.getSuccessors(element)
-        for successor in successors:
-            node = successor[0]
-            direction = successor[1]
-            if(node not in visited):
-                fringe.push(node)
-                storage[node] = [element, direction]
+    #     successors = problem.getSuccessors(element)
+    #     for successor in successors:
+    #         node = successor[0]
+    #         direction = successor[1]
+    #         if(node not in visited):
+    #             fringe.push(node)
+    #             storage[node] = [element, direction]
 
-    goal_path = []
-    curr_node = goal_state
-    while True:
-        # node that we use to go to the curr_node,
-        # means: node----->curr_node
-        node = storage[curr_node]
+    # goal_path = []
+    # curr_node = goal_state
+    # while True:
+    #     # node that we use to go to the curr_node,
+    #     # means: node----->curr_node
+    #     node = storage[curr_node]
 
-        # 1th element contains the direction
-        goal_path.append(node[1])
+    #     # 1th element contains the direction
+    #     goal_path.append(node[1])
 
-        # update current node
-        curr_node = node[0]
+    #     # update current node
+    #     curr_node = node[0]
 
-        # reach the start state
-        if(node[0] == start_state):
-            break
+    #     # reach the start state
+    #     if(node[0] == start_state):
+    #         break
 
-    print('steps length: ', len(goal_path))
+    # print('steps length: ', len(goal_path))
 
-    # import time
-    # time.sleep(100)
-
-    # reverse the path by slicing
-    return goal_path[::-1]
-
-    """
-    Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    """
-    "*** YOUR CODE HERE ***"
-    # util.raiseNotDefined()
+    # # reverse the path by slicing
+    # return goal_path[::-1]
 
 
 def breadthFirstSearch(problem):
-    return custom_search(problem, nullHeuristic)
+    return custom_search(problem, nullHeuristic, 'min')
 
 
 def uniformCostSearch(problem):
-    return custom_search(problem, nullHeuristic)
+    return custom_search(problem, nullHeuristic, 'min')
 
 
 def nullHeuristic(state, problem=None):
@@ -164,12 +146,15 @@ def nullHeuristic(state, problem=None):
     return 0
 
 
-def aStarSearch(problem, heuristic=nullHeuristic):
-    return custom_search(problem, heuristic)
+def aStarSearch(problem, heuristic=nullHeuristic,):
+    return custom_search(problem, heuristic, 'min')
     """Search the node that has the lowest combined cost and heuristic first."""
 
 
-def custom_search(problem, heuristic=nullHeuristic):
+def custom_search(problem, heuristic=nullHeuristic, heapType='min'):
+    sign = 1
+    if heapType == 'max': sign =-1
+
     start_state = problem.getStartState()
     goal_state = None
 
@@ -213,7 +198,7 @@ def custom_search(problem, heuristic=nullHeuristic):
 
                 # node_g_value is the real backward cost
                 # h_value is the estimated forward cost
-                updated = fringe.update(node, node_g_value+h_value)
+                updated = fringe.update(node, sign*(node_g_value+h_value))
 
                 # در اینجا چک کنیم که اگر هزینه ی نودی که قرار است به تابع اپدیت داده شود بیشتر از هزینه ی قبلی بود،
                 # آنگاه نود جدید را به استوریج اضافه نکنیم
