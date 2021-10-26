@@ -149,132 +149,11 @@ def depthFirstSearch(problem):
 
 
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-
-    start_state = problem.getStartState()
-    goal_state = None
-    visited = set()  # explored nodes
-    visited.add(start_state)
-    from util import Queue
-    fringe = Queue()  # Queue
-    fringe.push(start_state)
-
-    storage = dict()
-
-    while not fringe.isEmpty():
-        element = fringe.pop()
-
-        if problem.isGoalState(element):
-            goal_state = element
-            print('goal found')
-            break
-        successors = problem.getSuccessors(element)
-        for successor in successors:
-            node = successor[0]
-            direction = successor[1]
-            if(node not in visited):
-                fringe.push(node)
-                storage[node] = [element, direction]
-                visited.add(node)
-
-    goal_path = []
-    curr_node = goal_state
-    while True:
-        # node that we use to go to the curr_node,
-        # means: node----->curr_node
-        node = storage[curr_node]
-
-        # 1th element contains the direction that we us to go to the current node
-        goal_path.append(node[1])
-
-        # update current node
-        curr_node = node[0]
-
-        # reach the start state
-        if(node[0] == start_state):
-            break
-
-    print('steps length: ', len(goal_path))
-
-    print('cost of path: ', problem.getCostOfActions(goal_path[::-1]))
-
-    # import time
-    # time.sleep(100)
-
-    # reverse the path by slicing
-    return goal_path[::-1]
+    return custom_search(problem, nullHeuristic)
 
 
 def uniformCostSearch(problem):
-    start_state = problem.getStartState()
-    goal_state = None
-
-    visited = set()  # explored nodes
-
-    from util import PriorityQueue
-    fringe = PriorityQueue()  # Queue
-    # cost for starting node to reach to start is zero :))
-    fringe.push(start_state, 0)
-
-    g_vals = dict()  # stores all g_value of nodes
-    g_vals[start_state] = 0
-
-    storage = dict()
-    while not fringe.isEmpty():
-        curr_node = fringe.pop()
-        if problem.isGoalState(curr_node):
-            goal_state = curr_node
-            print('goal found')
-            break
-
-        visited.add(curr_node)
-
-        current_g_value = g_vals[curr_node]
-
-        successors = problem.getSuccessors(curr_node)
-
-        for successor in successors:
-            node = successor[0]
-            direction = successor[1]
-
-            cost_from_curr_node_to_node = successor[2]
-            # print(node, priority+cost)
-            if(node not in visited):
-                node_g_value = current_g_value + cost_from_curr_node_to_node
-                updated = fringe.update(node, node_g_value)
-
-                # در اینجا چک کنیم که اگر هزینه ی نودی که قرار است به تابع اپدیت داده شود بیشتر از هزینه ی قبلی بود،
-                # آنگاه نود جدید را به استوریج اضافه نکنیم
-                if updated:
-                    storage[node] = [curr_node, direction]
-                    g_vals[node] = node_g_value
-            
-            
-    goal_path = []
-    curr_node = goal_state
-    while True:
-        # node that we use to go to the curr_node,
-        # means: node----->curr_node
-        node = storage[curr_node]
-
-        # 1th element contains the direction that we us to go to the current node
-        goal_path.append(node[1])
-
-        # update current node
-        curr_node = node[0]
-
-        # reach the start state
-        if(node[0] == start_state):
-            break
-    print('steps length: ', len(goal_path))
-
-    print('cost of path: ', problem.getCostOfActions(goal_path[::-1]))
-
-    # import time
-    # time.sleep(100)
-
-    # reverse the path by slicing
-    return goal_path[::-1]
+    return custom_search(problem, nullHeuristic)
 
 
 def nullHeuristic(state, problem=None):
@@ -286,7 +165,11 @@ def nullHeuristic(state, problem=None):
 
 
 def aStarSearch(problem, heuristic=nullHeuristic):
+    return custom_search(problem, heuristic)
     """Search the node that has the lowest combined cost and heuristic first."""
+
+
+def custom_search(problem, heuristic=nullHeuristic):
     start_state = problem.getStartState()
     goal_state = None
 
@@ -315,7 +198,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         visited.add(curr_node)
 
         current_node_g_value = g_vals[curr_node]
-        
+
         successors = problem.getSuccessors(curr_node)
         for successor in successors:
             node = successor[0]
@@ -367,6 +250,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     # reverse the path by slicing
     return goal_path[::-1]
+
 
 # Abbreviations
 bfs = breadthFirstSearch
