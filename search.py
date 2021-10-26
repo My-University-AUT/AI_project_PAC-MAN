@@ -100,7 +100,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
 
 def custom_search(problem, heuristic=nullHeuristic, heapType='min'):
-   
+
     prioritySign = 1
     # heaptype shows that our priority queue should be maxheap or minheap
     # by default our priority queue use minHeap
@@ -116,12 +116,13 @@ def custom_search(problem, heuristic=nullHeuristic, heapType='min'):
 
     from util import PriorityQueue
     fringe = PriorityQueue()  # Queue
-    # cost for starting node to reach to start is zero :))
 
     F_value = heuristic(start_state, problem)  # at starting state: f(S) = h(S)
     fringe.push(start_state, F_value)
 
     g_vals = dict()  # stores all g_value of nodes
+
+    # cost for starting node to reach to start is zero :))
     g_vals[start_state] = 0
 
     storage = dict()
@@ -140,21 +141,21 @@ def custom_search(problem, heuristic=nullHeuristic, heapType='min'):
         successors = problem.getSuccessors(curr_node)
         for successor in successors:
             node = successor[0]
-            direction = successor[1]
-
-            cost_from_curr_node_to_this_node = successor[2]
-            # print(node, priority+cost)
+            
             if(node not in visited):
+                direction = successor[1]
+                cost_from_curr_node_to_this_node = successor[2]
+
                 h_value = heuristic(node, problem)
 
                 node_g_value = cost_from_curr_node_to_this_node + current_node_g_value
 
                 # node_g_value is the real backward cost
                 # h_value is the estimated forward cost
-                updated = fringe.update(node, prioritySign*(node_g_value+h_value))
+                updated = fringe.update(
+                    node, prioritySign*(node_g_value+h_value))
 
-                # در اینجا چک کنیم که اگر هزینه ی نودی که قرار است به تابع اپدیت داده شود بیشتر از هزینه ی قبلی بود،
-                # آنگاه نود جدید را به استوریج اضافه نکنیم
+                # if priorityQueue was updated sucessfully, then update that path(storage) and update node g_value
                 if updated:
                     storage[node] = [curr_node, direction]
                     g_vals[node] = node_g_value
