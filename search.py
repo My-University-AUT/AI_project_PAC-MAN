@@ -160,10 +160,6 @@ def custom_search(problem, heuristic=nullHeuristic, heapType='min'):
                     storage[node] = [curr_node, direction]
                     g_vals[node] = node_g_value
 
-                # visited.add(node)
-            # else:
-            #     fringe.update(node, priority+cost)
-
     goal_path = []
     curr_node = goal_state
     while True:
@@ -183,9 +179,6 @@ def custom_search(problem, heuristic=nullHeuristic, heapType='min'):
     print('steps length: ', len(goal_path))
 
     print('cost of path: ', problem.getCostOfActions(goal_path[::-1]))
-
-    # import time
-    # time.sleep(100)
 
     # reverse the path by slicing
     return goal_path[::-1]
