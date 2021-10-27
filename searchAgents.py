@@ -329,7 +329,7 @@ class CornersProblem(search.SearchProblem):
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        return (self.startingPosition,())
+        return (self.startingPosition, ())
 
     def isGoalState(self, state):
         """
@@ -389,7 +389,7 @@ class CornersProblem(search.SearchProblem):
 
 
 def cornersHeuristic(state, problem):
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
     """
     A heuristic for the CornersProblem that you defined.
 
@@ -402,15 +402,45 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
+
+    from time import sleep
+    # sleep(100)
+
+
+    if len(state[1]) == 4:
+        return 0
+
     corners = problem.corners  # These are the corner coordinates
     # These are the walls of the maze, as a Grid (game.py)
     walls = problem.walls
 
-    "*** YOUR CODE HERE ***"
     from util import manhattanDistance
-    dist = manhattanDistance(state, corners[1])
 
-    return dist  # Default to trivial solution
+    import sys
+
+    curr_node = state[0]
+    processed_corners = list(state[1])
+    
+    min_dist_ = 0
+    # for i in range(4):
+    processed_corner = None
+    min_dist = sys.maxsize
+    for corner in corners:
+        if corner not in processed_corners:
+            # pass
+            m_dist = manhattanDistance(curr_node, corner)
+            if m_dist < min_dist:
+                min_dist = m_dist
+                processed_corner = corner
+    # if processed_corner:
+    #     break
+
+    # min_dist_+=min_dist
+    # curr_node = processed_corner
+    # processed_corners.append(processed_corner)
+    # print(min_dist)
+    # sleep(30)
+    return min_dist  # Default to trivial solution
 
 
 class AStarCornersAgent(SearchAgent):
