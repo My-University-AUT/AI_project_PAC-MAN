@@ -34,6 +34,7 @@ description for details.
 Good luck and happy searching!
 """
 
+from time import sleep
 from game import Directions
 from game import Agent
 from game import Actions
@@ -406,8 +407,8 @@ def cornersHeuristic(state, problem):
     from time import sleep
     # sleep(100)
 
-    if len(state[1]) == 4:
-        return 0
+    # if len(state[1]) == 4:
+    #     return 0
 
     corners = problem.corners  # These are the corner coordinates
     # These are the walls of the maze, as a Grid (game.py)
@@ -436,8 +437,7 @@ def cornersHeuristic(state, problem):
             break
         curr_node = processed_corner
         processed_corners.append(processed_corner)
-        result+=min_dist
-
+        result += min_dist
 
     # print(result)
     from time import sleep
@@ -545,9 +545,71 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
+    # position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    # print(state[1])
+    # sleep(100)
+
+    # These are the walls of the maze, as a Grid (game.py)
+    # walls = problem.walls
+
+    from util import manhattanDistance
+
+    curr_node = state[0]
+
+
+    # if not problem.heuristicInfo['foodList'] :
+    # problem.heuristicInfo['foodList']  = getListOfFood(state[1])
+
+    # food_grid = problem.heuristicInfo['foodList']
+    food_grid = list(getListOfFood(state[1]))
+    # print(food_grid)
+    # sleep(10)
+    result = 0
+
+    for i in range(len(food_grid)):
+        import sys
+        min_dist = sys.maxsize
+        # min_dist = 0
+        processed_food = None
+        for food_pos in food_grid:
+            # if food_pos not in processed_corners:
+            # pass
+            m_dist = manhattanDistance(curr_node, food_pos)
+            if m_dist < min_dist:
+                min_dist = m_dist
+                processed_food = food_pos
+
+        if not processed_food:
+            break
+        curr_node = processed_food
+
+        # print(len(processed_food))
+        food_grid.remove(processed_food)
+        # print(len(processed_food))
+        # sleep(100)
+        result += min_dist
+
+    return result
+
+
+def getListOfFood(grid):
+
+    result = []
+    row_num = 0
+    for row in grid:
+        col_num=0
+        for col_item in row:
+            if col_item: # if col_tem == True means there is a food in this place
+                food_pos = tuple((row_num,col_num))
+                result.append(food_pos) 
+            col_num+=1
+        row_num+=1
+    # print(grid)
+    # print(result)
+    # sleep(100)
+
+    return result
 
 
 class ClosestDotSearchAgent(SearchAgent):
