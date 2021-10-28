@@ -406,7 +406,6 @@ def cornersHeuristic(state, problem):
     from time import sleep
     # sleep(100)
 
-
     if len(state[1]) == 4:
         return 0
 
@@ -416,31 +415,35 @@ def cornersHeuristic(state, problem):
 
     from util import manhattanDistance
 
-    import sys
-
     curr_node = state[0]
     processed_corners = list(state[1])
-    
-    min_dist_ = 0
-    # for i in range(4):
-    processed_corner = None
-    min_dist = sys.maxsize
-    for corner in corners:
-        if corner not in processed_corners:
-            # pass
-            m_dist = manhattanDistance(curr_node, corner)
-            if m_dist < min_dist:
-                min_dist = m_dist
-                processed_corner = corner
-    # if processed_corner:
-    #     break
 
-    # min_dist_+=min_dist
-    # curr_node = processed_corner
-    # processed_corners.append(processed_corner)
-    # print(min_dist)
-    # sleep(30)
-    return min_dist  # Default to trivial solution
+    result = 0
+    for i in range(4):
+        import sys
+        min_dist = sys.maxsize
+        # min_dist = 0
+        processed_corner = None
+        for corner in corners:
+            if corner not in processed_corners:
+                # pass
+                m_dist = manhattanDistance(curr_node, corner)
+                if m_dist < min_dist:
+                    min_dist = m_dist
+                    processed_corner = corner
+
+        if not processed_corner:
+            break
+        curr_node = processed_corner
+        processed_corners.append(processed_corner)
+        result+=min_dist
+
+
+    # print(result)
+    from time import sleep
+    # sleep(100)
+    # return min_dist  # Default to trivial solution
+    return result  # Default to trivial solution
 
 
 class AStarCornersAgent(SearchAgent):
