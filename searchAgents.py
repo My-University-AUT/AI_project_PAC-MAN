@@ -590,6 +590,10 @@ def foodHeuristic(state, problem):
         # sleep(100)
         result += min_dist
 
+    if result > 2:
+        result //= 1.5
+        # result //= 1.15
+
     return result
 
 
@@ -605,10 +609,6 @@ def getListOfFood(grid):
                 result.append(food_pos) 
             col_num+=1
         row_num+=1
-    # print(grid)
-    # print(result)
-    # sleep(100)
-
     return result
 
 
@@ -643,8 +643,10 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        from search import astar
+        path = astar(problem)
+        print('-------------')
+        return path
 
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -678,10 +680,15 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         The state is Pacman's position. Fill this in with a goal test that will
         complete the problem definition.
         """
-        x, y = state
+        # x, y = state
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        foods = getListOfFood(self.food)
+        if state in foods:
+            return True
+        return False
+
+        # "*** YOUR CODE HERE ***"
+        # util.raiseNotDefined()
 
 
 def mazeDistance(point1, point2, gameState):
