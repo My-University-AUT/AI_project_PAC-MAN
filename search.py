@@ -75,15 +75,15 @@ def tinyMazeSearch(problem):
 
 
 def depthFirstSearch(problem):
-    return custom_search(problem, nullHeuristic, 'max')
+    return custom_search(problem, heapType='max')
 
 
 def breadthFirstSearch(problem):
-    return custom_search(problem, nullHeuristic, 'min')
+    return custom_search(problem)
 
 
 def uniformCostSearch(problem):
-    return custom_search(problem, nullHeuristic, 'min')
+    return custom_search(problem)
 
 
 def nullHeuristic(state, problem=None):
@@ -141,7 +141,7 @@ def custom_search(problem, heuristic=nullHeuristic, heapType='min'):
         successors = problem.getSuccessors(curr_node)
         for successor in successors:
             node = successor[0]
-            
+
             if(node not in visited):
                 direction = successor[1]
                 cost_from_curr_node_to_this_node = successor[2]
@@ -179,6 +179,71 @@ def custom_search(problem, heuristic=nullHeuristic, heapType='min'):
     print('steps length: ', len(goal_path))
 
     print('cost of path: ', problem.getCostOfActions(goal_path[::-1]))
+
+    # reverse the path by slicing
+    return goal_path[::-1]
+
+
+# this customized bfs_search is just for part 7 of project
+def custom_bfs(problem, startState, goalState):
+
+    walls = problem.walls
+
+    start_state = startState
+    reach_goal_state = False
+
+    visited = set()  # explored nodes
+
+    from util import Queue
+    fringe = Queue()  # Queue
+
+    fringe.push(start_state)
+
+    storage = dict()
+
+    while not fringe.isEmpty():
+        curr_node = fringe.pop()
+        if curr_node == goalState:
+            reach_goal_state = True
+            print('goal found')
+            break
+
+        visited.add(curr_node)
+
+        from game import Directions, Actions
+        for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+            x, y = curr_node
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not walls[nextx][nexty]:
+                next_node = (nextx, nexty)
+
+                if(next_node not in visited):
+                    direction = action
+
+                    fringe.push(next_node)                    
+                    storage[next_node] = [curr_node, direction]
+
+    if not reach_goal_state:
+        return []
+
+    goal_path = []
+    curr_node = goalState
+    while True:
+        # node that we use to go to the curr_node,
+        # means: node----->curr_node
+        node = storage[curr_node]
+
+        # 1th element contains the direction that we us to go to the current node
+        goal_path.append(node[1])
+
+        # update current node
+        curr_node = node[0]
+
+        # reach the start state
+        if(node[0] == start_state):
+            break
+    print('steps length: ', len(goal_path))
 
     # reverse the path by slicing
     return goal_path[::-1]
