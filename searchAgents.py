@@ -545,7 +545,6 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    from util import manhattanDistance
 
     curr_node = state[0]
 
@@ -554,8 +553,8 @@ def foodHeuristic(state, problem):
     max_dis = 0
     furthest_node = None
     for food_pos in food_grid:
-        # dist = mazeDistance(food_pos, curr_node, problem.startingGameState)
-        dist = manhattanDistance(food_pos, curr_node)
+        from search import custom_bfs
+        dist = len(custom_bfs(problem, food_pos, curr_node))
         # print(dist)
         # sleep(10)
         if dist >= max_dis:
@@ -563,8 +562,7 @@ def foodHeuristic(state, problem):
             furthest_node = food_pos
     if not furthest_node:
         return 0
-    from search import custom_bfs
-    return len(custom_bfs(problem, furthest_node, curr_node))
+    return max_dis
 
 
 def getListOfFood(grid):
