@@ -26,12 +26,11 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-import time
-import signal
 import sys
 import inspect
 import heapq
 import random
+import io
 
 
 class FixedRandom:
@@ -166,8 +165,8 @@ class Queue:
 
     def pop(self):
         """
-          Dequeue the earliest enqueued item still in the queue. This
-          operation removes the item from the queue.
+        Dequeue the earliest enqueued item still in the queue. This
+        operation removes the item from the queue.
         """
         return self.list.pop()
 
@@ -246,9 +245,9 @@ def manhattanDistance(xy1, xy2):
 
 
 """
-  Data structures and functions useful for various course projects
+Data structures and functions useful for various course projects
 
-  The search project should not need anything below this line.
+The search project should not need anything below this line.
 """
 
 
@@ -263,12 +262,12 @@ class Counter(dict):
     all keys are defaulted to have value 0.  Using a dictionary:
 
     a = {}
-    print(a['test'])
+    print a['test']
 
     would give an error, while the Counter class analogue:
 
     >>> a = Counter()
-    >>> print(a['test'])
+    >>> print a['test']
     0
 
     returns the default 0 value. Note that to reference a key
@@ -277,14 +276,14 @@ class Counter(dict):
 
     >>> a = Counter()
     >>> a['test'] = 2
-    >>> print(a['test'])
+    >>> print a['test']
     2
 
     This is very useful for counting things without initializing their counts,
     see for example:
 
     >>> a['blah'] += 1
-    >>> print(a['blah'])
+    >>> print a['blah']
     1
 
     The counter also includes additional functionality useful in implementing
@@ -315,9 +314,9 @@ class Counter(dict):
         """
         Returns the key with the highest value.
         """
-        if len(self.keys()) == 0:
+        if len(list(self.keys())) == 0:
             return None
-        all = self.items()
+        all = list(self.items())
         values = [x[1] for x in all]
         maxIndex = values.index(max(values))
         return all[maxIndex][0]
@@ -334,7 +333,8 @@ class Counter(dict):
         >>> a.sortedKeys()
         ['second', 'third', 'first']
         """
-        sortedItems = self.items()
+        sortedItems = list(self.items())
+
         def compare(x, y): return sign(y[1] - x[1])
         sortedItems.sort(cmp=compare)
         return [x[0] for x in sortedItems]
@@ -355,7 +355,7 @@ class Counter(dict):
         total = float(self.totalCount())
         if total == 0:
             return
-        for key in self.keys():
+        for key in list(self.keys()):
             self[key] = self[key] / total
 
     def divideAll(self, divisor):
@@ -413,7 +413,7 @@ class Counter(dict):
         >>> a['first']
         1
         """
-        for key, value in y.items():
+        for key, value in list(y.items()):
             self[key] += value
 
     def __add__(self, y):
@@ -481,7 +481,7 @@ def raiseNotDefined():
 
 def normalize(vectorOrCounter):
     """
-    normalize a vector or counter by dividing each value by the sum of all values
+    Normalize a vector or counter by dividing each value by the sum of all values
     """
     normalizedCounter = Counter()
     if type(vectorOrCounter) == type(normalizedCounter):
@@ -489,7 +489,7 @@ def normalize(vectorOrCounter):
         total = float(counter.totalCount())
         if total == 0:
             return counter
-        for key in counter.keys():
+        for key in list(counter.keys()):
             value = counter[key]
             normalizedCounter[key] = value / total
         return normalizedCounter
@@ -540,8 +540,8 @@ def sampleFromCounter(ctr):
 
 def getProbability(value, distribution, values):
     """
-      Gives the probability of a value under a discrete distribution
-      defined by (distributions, values).
+    Gives the probability of a value under a discrete distribution
+    defined by (distributions, values).
     """
     total = 0.0
     for prob, val in zip(distribution, values):
@@ -624,11 +624,12 @@ def lookup(name, namespace):
         module = __import__(moduleName)
         return getattr(module, objName)
     else:
-        modules = [obj for obj in namespace.values() if str(type(obj))
-                   == "<type 'module'>"]
+        modules = [obj for obj in list(namespace.values()) if str(
+            type(obj)) == "<type 'module'>"]
         options = [getattr(module, name)
                    for module in modules if name in dir(module)]
-        options += [obj[1] for obj in namespace.items() if obj[0] == name]
+        options += [obj[1]
+                    for obj in list(namespace.items()) if obj[0] == name]
         if len(options) == 1:
             return options[0]
         if len(options) > 1:
@@ -640,7 +641,8 @@ def pause():
     """
     Pauses the output stream awaiting user feedback.
     """
-    input("<Press enter/return to continue>")
+    print("<Press enter/return to continue>")
+    input()
 
 
 # code to handle timeouts
@@ -651,6 +653,8 @@ def pause():
 # of active time outs.  Currently, questions which have test cases calling
 # this have all student code so wrapped.
 #
+import signal
+import time
 
 
 class TimeoutFunctionException(Exception):
