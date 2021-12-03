@@ -404,11 +404,7 @@ def cornersHeuristic(state, problem):
     admissible (as well as consistent).
     """
 
-    from time import sleep
-    # sleep(100)
 
-    # if len(state[1]) == 4:
-    #     return 0
 
     corners = problem.corners  # These are the corner coordinates
     # These are the walls of the maze, as a Grid (game.py)

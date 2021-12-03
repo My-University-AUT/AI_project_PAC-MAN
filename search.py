@@ -157,7 +157,7 @@ def custom_search(problem, heuristic=nullHeuristic, heapType='min'):
 
                 # if priorityQueue was updated sucessfully, then update that path(storage) and update node g_value
                 if updated:
-                    storage[node] = [curr_node, direction, h_value]
+                    storage[node] = [curr_node, direction]
                     g_vals[node] = node_g_value
 
     goal_path = []
@@ -173,9 +173,6 @@ def custom_search(problem, heuristic=nullHeuristic, heapType='min'):
         # update current node
         curr_node = node[0]
 
-        f = open("heuristic_vals.txt", "a")
-        f.write("node: "+str(node[0])+"  heuristic value: "+ str(node[2])+ "\n")
-        f.close()
         # reach the start state
         if(node[0] == start_state):
             break
@@ -246,7 +243,6 @@ def custom_bfs(problem, startState, goalState):
         # reach the start state
         if(node[0] == start_state):
             break
-
 
     # reverse the path by slicing
     return goal_path[::-1]
