@@ -551,8 +551,6 @@ def foodHeuristic(state, problem):
     for food_pos in food_grid:
         from search import custom_bfs
         dist = len(custom_bfs(problem, food_pos, curr_node))
-        # print(dist)
-        # sleep(10)
         if dist >= max_dis:
             max_dis = dist
             furthest_node = food_pos
