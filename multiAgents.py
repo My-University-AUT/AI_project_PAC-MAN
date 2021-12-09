@@ -105,6 +105,7 @@ class ReflexAgent(Agent):
 
         return minimum_dist_from_ghosts - minimum_food_dist
        
+       
 
 def scoreEvaluationFunction(currentGameState):
     """
