@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -14,7 +14,8 @@
 
 from util import manhattanDistance
 from game import Directions
-import random, util
+import random
+import util
 
 from game import Agent
 
@@ -42,10 +43,13 @@ class ReflexAgent(Agent):
         legalMoves = gameState.getLegalActions()
 
         # Choose one of the best actions
-        scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
+        scores = [self.evaluationFunction(
+            gameState, action) for action in legalMoves]
         bestScore = max(scores)
-        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-        chosenIndex = random.choice(bestIndices)  # Pick randomly among the best
+        bestIndices = [index for index in range(
+            len(scores)) if scores[index] == bestScore]
+        # Pick randomly among the best
+        chosenIndex = random.choice(bestIndices)
 
         "Add more of your code here if you want to"
 
@@ -68,14 +72,39 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
+        pacman_newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        newScaredTimes = [
+            ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        from sys import maxsize
+        minimum_dist_from_ghosts = maxsize
+        from util import manhattanDistance
 
+        zip_object = zip(newGhostStates, newScaredTimes)
+        for ghost, ghost_ScaredTime in zip_object:
+            ghost_new_pos = ghost.getPosition()
+            dist = manhattanDistance(ghost_new_pos, pacman_newPos)
+            if ghost_ScaredTime == 0 and dist < minimum_dist_from_ghosts:
+                minimum_dist_from_ghosts = dist
+
+        food_list = currentGameState.getFood().asList()
+        # food_list = newFood.asList()
+        # number_of_foods = len(food_list)
+        minimum_food_dist = maxsize
+        for food_pos in food_list:
+            dist_from_food = manhattanDistance(pacman_newPos, food_pos)
+            if dist_from_food < minimum_food_dist:
+                minimum_food_dist = dist_from_food
+
+        if minimum_dist_from_ghosts <= 1:
+            return -maxsize
+        if minimum_food_dist == 0:
+            return maxsize
+
+        return minimum_dist_from_ghosts - minimum_food_dist
+       
 
 def scoreEvaluationFunction(currentGameState):
     """
