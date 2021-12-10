@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+from sys import maxsize
 from util import manhattanDistance
 from game import Directions
 import random
@@ -103,9 +104,9 @@ class ReflexAgent(Agent):
         if minimum_food_dist == 0:
             return maxsize
 
-        return minimum_dist_from_ghosts - minimum_food_dist
-       
-       
+        # return minimum_dist_from_ghosts - minimum_food_dist
+        return 1/minimum_food_dist
+
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -144,6 +145,56 @@ class MinimaxAgent(MultiAgentSearchAgent):
     Your minimax agent (question 2)
     """
 
+    def value(self, gameState, depth, agentIndex):
+        # pass
+        # if gameState.isWin() or gameState.isLose():
+        #     return self.evaluationFunction(gameState)
+
+        agentsNum = gameState.getNumAgents()
+        agentIndex = (agentIndex+1) % (agentsNum)
+        if not gameState.getLegalActions(agentIndex):
+            return self.evaluationFunction(gameState)
+
+        if agentIndex == 0:
+            if self.depth == depth+1:
+                return self.evaluationFunction(gameState)
+            return self.maxValue(gameState=gameState, depth=depth+1, agentIndex=agentIndex)
+        else:
+            return self.minValue(gameState=gameState, depth=depth, agentIndex=agentIndex)
+
+    def maxValue(self, gameState, depth, agentIndex):
+        value = -maxsize
+
+        # agentsNum = gameState.getNumAgents()
+
+        # agentIndex = index % (agentsNum)
+
+        for action in gameState.getLegalActions(agentIndex):
+            successorGameState = gameState.generateSuccessor(
+                agentIndex, action)
+
+            value = max(value, self.value(
+                gameState=successorGameState,
+                depth=depth,
+                agentIndex=agentIndex
+            ))
+        return value
+
+    def minValue(self, gameState, depth, agentIndex):
+        value = maxsize
+
+        # agentIndex = self.index
+        for action in gameState.getLegalActions(agentIndex):
+            successorGameState = gameState.generateSuccessor(
+                agentIndex, action)
+
+            value = min(value, self.value(
+                gameState=successorGameState,
+                depth=depth,
+                agentIndex=agentIndex
+            ))
+        return value
+
     def getAction(self, gameState):
         """
         Returns the minimax action from the current gameState using self.depth
@@ -167,8 +218,36 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
+        numberOfAgents = gameState.getNumAgents()
+        # print(agentIndex)
+        # print(actions)
+        # print(self.depth)
+        depth = self.depth
+        from sys import maxsize
+
+        maxValue = -maxsize
+        agentIndex = self.index
+        actions = gameState.getLegalActions(agentIndex)
+        from game import Directions
+        returned_action = Directions.STOP
+        for action in actions:
+            successorGameState = gameState.generateSuccessor(
+                agentIndex, action)
+            value = self.value(gameState=successorGameState,
+                               depth=0,
+                               agentIndex=0)
+            # value = self.minValue(gameState=successorGameState,depth=0, index=agentIndex)
+            if value > maxValue:
+                maxValue = value
+                returned_action = action
+
+        return returned_action
+
+        from time import sleep
+        sleep(1)
+        # print(self.evaluationFunction)
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return action_to_return
 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -208,7 +287,41 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # successorGameState = currentGameState.generatePacmanSuccessor(action)
+    successorGameState = currentGameState
+    pacman_newPos = successorGameState.getPacmanPosition()
+    newFood = successorGameState.getFood()
+    newGhostStates = successorGameState.getGhostStates()
+    newScaredTimes = [
+        ghostState.scaredTimer for ghostState in newGhostStates]
+
+    from sys import maxsize
+    minimum_dist_from_ghosts = maxsize
+    from util import manhattanDistance
+
+    zip_object = zip(newGhostStates, newScaredTimes)
+    for ghost, ghost_ScaredTime in zip_object:
+        ghost_new_pos = ghost.getPosition()
+        dist = manhattanDistance(ghost_new_pos, pacman_newPos)
+        if ghost_ScaredTime == 0 and dist < minimum_dist_from_ghosts:
+            minimum_dist_from_ghosts = dist
+
+    food_list = currentGameState.getFood().asList()
+    # food_list = newFood.asList()
+    # number_of_foods = len(food_list)
+    minimum_food_dist = maxsize
+    for food_pos in food_list:
+        dist_from_food = manhattanDistance(pacman_newPos, food_pos)
+        if dist_from_food < minimum_food_dist:
+            minimum_food_dist = dist_from_food
+
+    if minimum_dist_from_ghosts <= 1:
+        return -maxsize
+    if minimum_food_dist == 0:
+        return maxsize
+
+    return minimum_dist_from_ghosts - minimum_food_dist
+    # return 1/minimum_food_dist
 
 
 # Abbreviation
