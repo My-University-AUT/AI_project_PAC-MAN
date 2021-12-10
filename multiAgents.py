@@ -146,9 +146,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
 
     def value(self, gameState, depth, agentIndex):
-        # pass
-        # if gameState.isWin() or gameState.isLose():
-        #     return self.evaluationFunction(gameState)
+        if gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState)
 
         agentsNum = gameState.getNumAgents()
         agentIndex = (agentIndex+1) % (agentsNum)
@@ -218,11 +217,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
-        numberOfAgents = gameState.getNumAgents()
-        # print(agentIndex)
-        # print(actions)
-        # print(self.depth)
-        depth = self.depth
         from sys import maxsize
 
         maxValue = -maxsize
@@ -235,19 +229,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 agentIndex, action)
             value = self.value(gameState=successorGameState,
                                depth=0,
-                               agentIndex=0)
-            # value = self.minValue(gameState=successorGameState,depth=0, index=agentIndex)
+                               agentIndex=agentIndex)
             if value > maxValue:
                 maxValue = value
                 returned_action = action
 
         return returned_action
-
-        from time import sleep
-        sleep(1)
-        # print(self.evaluationFunction)
-        "*** YOUR CODE HERE ***"
-        return action_to_return
 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -255,12 +242,116 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     Your minimax agent with alpha-beta pruning (question 3)
     """
 
+    def value(self, gameState, depth, agentIndex, alpha, beta):
+        if gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState)
+
+        agentsNum = gameState.getNumAgents()
+        agentIndex = (agentIndex+1) % (agentsNum)
+        if not gameState.getLegalActions(agentIndex):
+            return self.evaluationFunction(gameState)
+
+        if agentIndex == 0:
+            if self.depth == depth+1:
+                return self.evaluationFunction(gameState)
+            return self.maxValue(gameState=gameState,
+                                 depth=depth+1,
+                                 agentIndex=agentIndex,
+                                 alpha=alpha, beta=beta)
+        else:
+            return self.minValue(gameState=gameState,
+                                 depth=depth,
+                                 agentIndex=agentIndex,
+                                 alpha=alpha, beta=beta)
+
+    def maxValue(self, gameState, depth, agentIndex, alpha, beta):
+        value = -maxsize
+
+        for action in gameState.getLegalActions(agentIndex):
+            successorGameState = gameState.generateSuccessor(
+                agentIndex, action)
+
+            value = max(value, self.value(
+                gameState=successorGameState,
+                depth=depth,
+                agentIndex=agentIndex,
+                alpha=alpha, beta=beta
+            ))
+            if value > beta:
+                return value
+            alpha = max(alpha, value)
+           
+
+        return value
+
+    def minValue(self, gameState, depth, agentIndex, alpha, beta):
+        value = maxsize
+
+        for action in gameState.getLegalActions(agentIndex):
+            successorGameState = gameState.generateSuccessor(
+                agentIndex, action)
+
+            value = min(value, self.value(
+                gameState=successorGameState,
+                depth=depth,
+                agentIndex=agentIndex,
+                alpha=alpha, beta=beta
+            ))
+            if value < alpha:
+                return value
+            beta = min(beta, value)
+           
+        return value
+
     def getAction(self, gameState):
         """
-        Returns the minimax action using self.depth and self.evaluationFunction
+        Returns the minimax action from the current gameState using self.depth
+        and self.evaluationFunction.
+
+        Here are some method calls that might be useful when implementing minimax.
+
+        gameState.getLegalActions(agentIndex):
+        Returns a list of legal actions for an agent
+        agentIndex=0 means Pacman, ghosts are >= 1
+
+        gameState.generateSuccessor(agentIndex, action):
+        Returns the successor game state after an agent takes an action
+
+        gameState.getNumAgents():
+        Returns the total number of agents in the game
+
+        gameState.isWin():
+        Returns whether or not the game state is a winning state
+
+        gameState.isLose():
+        Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        from sys import maxsize
+
+        maxValue = -maxsize
+        agentIndex = self.index
+        actions = gameState.getLegalActions(agentIndex)
+        from game import Directions
+        returned_action = Directions.STOP
+        alpha=-maxsize
+        beta=maxsize
+        for action in actions:
+            successorGameState = gameState.generateSuccessor(
+                agentIndex, action)
+            value = self.value(gameState=successorGameState,
+                               depth=0,
+                               agentIndex=agentIndex,
+                               alpha=alpha, beta=beta
+                               )
+            if value > maxValue:
+                maxValue = value
+                returned_action = action
+
+            if value > beta:
+                break
+            alpha = max(alpha, value)
+
+        return returned_action
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
