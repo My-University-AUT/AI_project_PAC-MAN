@@ -462,8 +462,6 @@ def betterEvaluationFunction(currentGameState):
 	if currentGameState.isWin():
 		return maxsize
 		
-	capsuls = currentGameState.getCapsules()
-	from time import sleep
 
 	pacmanPos = currentGameState.getPacmanPosition()
 	foodList = currentGameState.getFood().asList()
@@ -486,27 +484,17 @@ def betterEvaluationFunction(currentGameState):
 
 	if minimum_dist_from_ghosts <= 2:
 		return -maxsize
-
-	minimum_food_dist = maxsize
-	foodFound = False
-	for food_pos in foodList:
-		dist_from_food = manhattanDistance(pacmanPos, food_pos)
-		if dist_from_food < minimum_food_dist:
-			foodFound = True
-			minimum_food_dist = dist_from_food
-
-	# nearest_dist_to_capsule = -maxsize
-	# capsule_found = False
-	# for capsule in capsuls:
-	# 	capsule_found = True
-	# 	dist = manhattanDistance(capsule, pacmanPos)
-	# 	nearest_dist_to_capsule = min(nearest_dist_to_capsule, dist)
-
 	if scared_ghost_found:
 		return currentGameState.getScore()+5/minimum_dist_from_scared_ghost
 
-	# if minimum_food_dist == 0:
-	# 	return maxsize
+	minimum_food_dist = maxsize
+	for food_pos in foodList:
+		dist_from_food = manhattanDistance(pacmanPos, food_pos)
+		if dist_from_food < minimum_food_dist:
+			minimum_food_dist = dist_from_food
+
+	if minimum_food_dist == 0:
+		return maxsize
 
 	return currentGameState.getScore()-8/minimum_dist_from_ghosts+4/minimum_food_dist
 	
