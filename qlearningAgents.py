@@ -24,19 +24,16 @@ import math
 class QLearningAgent(ReinforcementAgent):
     """
       Q-Learning Agent
-
       Functions you should fill in:
         - computeValueFromQValues
         - computeActionFromQValues
         - getQValue
         - getAction
         - update
-
       Instance variables you have access to
         - self.epsilon (exploration prob)
         - self.alpha (learning rate)
         - self.discount (discount rate)
-
       Functions you should use
         - self.getLegalActions(state)
           which returns legal actions for a state
@@ -83,8 +80,6 @@ class QLearningAgent(ReinforcementAgent):
             # there's no legal actions
             return 0.0
 
-        # util.raiseNotDefined()
-
     def computeActionFromQValues(self, state):
         """
           Compute the best action to take in a state.  Note that if there
@@ -102,12 +97,11 @@ class QLearningAgent(ReinforcementAgent):
             if q_val > max_q_val:
                 max_q_val = q_val
                 actionToReturn = action
-            
+
             if q_val == max_q_val:
                 actionToReturn = random.choice([action, actionToReturn])
 
         return actionToReturn
-        # util.raiseNotDefined()
 
     def getAction(self, state):
         """
@@ -125,9 +119,8 @@ class QLearningAgent(ReinforcementAgent):
         action = None
         "*** YOUR CODE HERE ***"
 
-        random_number = random.randint(0, 1)
-        # the larger value epsilon (close to one), the chance for exploration is higher
-        if random_number > self.epsilon:
+        random_number = random.random()
+        if self.epsilon > random_number:
             action = random.choice(legalActions)
         else:
             action = self.getPolicy(state)
@@ -146,8 +139,7 @@ class QLearningAgent(ReinforcementAgent):
         "*** YOUR CODE HERE ***"
         sample = reward + self.discount * self.getValue(nextState)
         q_val = self.getQValue(state, action)
-        self.Q[state, action] = q_val + self.alpha * (sample - q_val)
-        # util.raiseNotDefined()
+        self.Q[(state, action)] = q_val + self.alpha * (sample - q_val)
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
@@ -176,7 +168,6 @@ class PacmanQAgent(QLearningAgent):
         args['numTraining'] = numTraining
         self.index = 0  # This is always Pacman
         QLearningAgent.__init__(self, **args)
-        
 
     def getAction(self, state):
         """
@@ -184,8 +175,8 @@ class PacmanQAgent(QLearningAgent):
         informs parent of action for Pacman.  Do not change or remove this
         method.
         """
-        action = QLearningAgent.getAction(self,state)
-        self.doAction(state,action)
+        action = QLearningAgent.getAction(self, state)
+        self.doAction(state, action)
         return action
 
 
@@ -212,11 +203,10 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
         "*** YOUR CODE HERE ***"
-        weight = self.getWeights()
-        featureVector = self.featExtractor.getFeatures(state,action)
+        weights = self.getWeights()
+        featureVector = self.featExtractor.getFeatures(state, action)
 
-        return weight * featureVector
-        util.raiseNotDefined()
+        return weights * featureVector
 
     def update(self, state, action, nextState, reward):
         """
@@ -224,11 +214,13 @@ class ApproximateQAgent(PacmanQAgent):
         """
 
         featureVector = self.featExtractor.getFeatures(state, action)
-        diff = reward + self.discount * self.getValue(nextState) - self.getQValue(state, action)
+        max_Q_val = self.getValue(nextState)
+        difference = reward + self.discount * \
+            max_Q_val - self.getQValue(state, action)
         for feature in featureVector:
-          self.weights[feature] += self.alpha * diff * featureVector[feature]
-
-        # util.raiseNotDefined()
+            # Wi <- Wi + alpha*difference*Fi
+            self.weights[feature] = self.weights[feature] + \
+                self.alpha * difference * featureVector[feature]
 
     def final(self, state):
         "Called at the end of each game."
